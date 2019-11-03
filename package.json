@@ -1,0 +1,18 @@
+{
+  "name": "course",
+  "version": "1.0.0",
+  "description": "",
+  "main": "imageConverter.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "AndreW Korol",
+  "license": "ISC",
+  "dependencies": {
+    "@tensorflow/tfjs": "^1.3.0",
+    "@tensorflow/tfjs-node": "^1.2.11"    
+  },
+  "devDependencies": {
+    "http-server": "^0.11.1"
+  }
+}
