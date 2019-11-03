@@ -1,8 +1,4 @@
-const tf = require('@tensorflow/tfjs-node'),
-  ImageConverter = require('./imageConverter.js');
-
-const imgConv = new ImageConverter(),  
-  model = tf.sequential();
+const tf = require('@tensorflow/tfjs-node');
 
 //Total number of convolutional filters to use
 const NUMBER_OF_FILTERS = 32;
@@ -20,58 +16,64 @@ const DIMENSIONALITY = 128;
 const NUMBER_OF_CLASSES = 2;
 
 class CNN {
+  constructor(){
+    this.model = tf.sequential();
+  }
+
   createCNNModel() {
-    model.add(tf.layers.conv2d({
+    this.model.add(tf.layers.conv2d({
       inputShape: [IMAGE_WIDTH, IMAGE_HEIGTH, IMAGE_CHANNELS],
       filters: NUMBER_OF_FILTERS,
       kernelSize: KERNEL_SIZE,
       padding: 'valid'
     }));
 
-    model.add(tf.layers.reLU());
+    this.model.add(tf.layers.reLU());
 
-    model.add(tf.layers.conv2d({
+    this.model.add(tf.layers.conv2d({
       filters: NUMBER_OF_FILTERS,
       kernelSize: KERNEL_SIZE
     }));
 
-    model.add(tf.layers.reLU());
+    this.model.add(tf.layers.reLU());
 
-    model.add(tf.layers.maxPooling2d({
+    this.model.add(tf.layers.maxPooling2d({
       poolSize: [MAX_POOLING, MAX_POOLING]
     }));
 
-    model.add(tf.layers.dropout({
+    this.model.add(tf.layers.dropout({
       rate: DROPOUT_VALUE
     }));
 
-    model.add(tf.layers.flatten());
+    this.model.add(tf.layers.flatten());
 
-    model.add(tf.layers.dense({
+    this.model.add(tf.layers.dense({
       units: DIMENSIONALITY
     }));
 
-    model.add(tf.layers.reLU());
+    this.model.add(tf.layers.reLU());
 
-    model.add(tf.layers.dropout({
+    this.model.add(tf.layers.dropout({
       rate: DROPOUT_VALUE
     }));
 
-    model.add(tf.layers.dense({
+    this.model.add(tf.layers.dense({
       units: NUMBER_OF_CLASSES
     }));
 
-    model.add(tf.layers.softmax());
+    this.model.add(tf.layers.softmax());
 
-    model.compile({
+    this.model.compile({
       optimizer: 'adadelta',
       loss: 'categoricalCrossentropy',
       metrics: ['accuracy']
     });
 
-    model.summary();
-    model.getConfig();
+    this.model.summary();
+    this.model.getConfig();
 
-    return model;
+    return this.model;
   }
 }
+
+module.exports = CNN;
