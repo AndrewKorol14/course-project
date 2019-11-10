@@ -74,6 +74,16 @@ class CNN {
 
     return this.model;
   }
+
+  async trainModel(model, trainData, labels){
+    let history = await model.fit(tf.stack(trainData), labels, {
+      batchSize: 1,
+        epochs: 10
+      });
+    console.log(history.history);
+    
+    return history;
+  }
 }
 
 module.exports = CNN;
