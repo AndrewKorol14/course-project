@@ -2,15 +2,15 @@ const tf = require('@tensorflow/tfjs-node'),
   CNN = require('./cnn.js'),
   Data = require('./data.js');
 
-const cnn = new CNN(),
-  data = new Data();
+const cnn = new CNN();  
 
 async function run() {
-  let model = cnn.createCNNModel();
-  let trainData = data.loadData('./imgFolder/');
-  let history = await cnn.trainModel(model, trainData.data, trainData.labels);
-  let pred = prepareDataForPrediction('./imgFolder/', 'l2.jpg');
-  model.predict(pred.reshape([1, 200, 200, 3]), {batchSize: 1}).print();
+  const data = new Data();
+  await data.load();
+  const model = cnn.createCNNModel();
+  await cnn.trainCNNModel(model, data);
+  
+  const [p, l] = cnn.makePrediction(model, data, 3);
 }  
 
 run();

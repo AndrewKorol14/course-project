@@ -75,14 +75,35 @@ class CNN {
     return this.model;
   }
 
-  async trainModel(model, trainData, labels){
-    let history = await model.fit(tf.stack(trainData), labels, {
-      batchSize: 1,
-        epochs: 10
-      });
-    console.log(history.history);
-    
-    return history;
+  async trainCNNModel(model, data) {
+    const BATCH_CONTAINER_SIZE = 1;
+    const TRAIN_DATA_SIZE = 12;
+    const TEST_DATA_SIZE = 3;
+
+    const [trainD, trainL] = tf.tidy(() => {
+      const bat = data.getTrainBatchContainer(TRAIN_DATA_SIZE);
+      return [bat.xSet.reshape([TRAIN_DATA_SIZE, 200, 200, 3]), bat.labelsSet];
+    });
+
+    const [testD, testL] = tf.tidy(() => {
+      const bat = data.getTestBatchContainer(TEST_DATA_SIZE);
+      return [bat.xSet.reshape([TEST_DATA_SIZE, 200, 200, 3]), bat.labelsSet];
+    });
+
+    return model.fit(trainD, trainL, {
+      batchSize: BATCH_CONTAINER_SIZE,
+      epochs: 5,
+      shuffle: true
+    });
+  }
+
+  makePrediction(model, data, dataSize) {
+    const testData = data.getTestBatchContainer(dataSize);
+    const testD = testData.xSet.reshape([dataSize, 200, 200, 3]);
+    const labels = testData.labelsSet;
+    const predictions = model.predict(testD);
+    testD.dispose();
+    return [predictions, labels];
   }
 }
 
