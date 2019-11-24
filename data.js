@@ -4,13 +4,13 @@ const tf = require('@tensorflow/tfjs-node'),
 
 const imgConv = new ImageConverter();
 
-const COMMON_IMAGE_SIZE = 200 * 200 * 3;
+const COMMON_IMAGE_SIZE = 100 * 100 * 1;
 
-const CLASS_QUANTITY = 2;
+const CLASS_QUANTITY = 4;
 
-const ALL_ELEMENT_QUANTITY = 11;
-const TRAIN_ELEMENT_QUANTITY = 7;
-const TEST_ELEMENT_QUANTITY = 4;
+const ALL_ELEMENT_QUANTITY = 120;
+const TRAIN_ELEMENT_QUANTITY = 100;
+const TEST_ELEMENT_QUANTITY = 20;
 
 class Data {
   constructor(){
@@ -23,7 +23,7 @@ class Data {
 
 async load() {
     let labelsArr = new Uint8Array(labelsJson.labels),
-      imagesArr = await imgConv.getImagesUInt8Array('./imgFolder/', COMMON_IMAGE_SIZE, ALL_ELEMENT_QUANTITY);
+      imagesArr = await imgConv.getImagesUInt8Array('./cannyImgFolder/', COMMON_IMAGE_SIZE, ALL_ELEMENT_QUANTITY);
     
     this.trainInd = tf.util.createShuffledIndices(TRAIN_ELEMENT_QUANTITY);
     this.testInd = tf.util.createShuffledIndices(TEST_ELEMENT_QUANTITY);

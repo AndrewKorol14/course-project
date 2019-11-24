@@ -5,15 +5,15 @@ const NUMBER_OF_FILTERS = 32;
 //Size of kernel matrix
 const KERNEL_SIZE = 3;
 //For color image 3 channels (RGB)
-const IMAGE_CHANNELS = 3;
+const IMAGE_CHANNELS = 1;
 //Input images size
-const IMAGE_WIDTH = 200;
-const IMAGE_HEIGTH = 200;
+const IMAGE_WIDTH = 100;
+const IMAGE_HEIGTH = 100;
 const MAX_POOLING = 2;
 const DROPOUT_VALUE = 0.5;
 const DIMENSIONALITY = 128;
 //Number of gestures
-const NUMBER_OF_CLASSES = 2;
+const NUMBER_OF_CLASSES = 4;
 
 class CNN {
   constructor(){
@@ -76,22 +76,23 @@ class CNN {
   }
 
   async trainCNNModel(model, data) {
-    const BATCH_CONTAINER_SIZE = 1;
-    const TRAIN_DATA_SIZE = 12;
-    const TEST_DATA_SIZE = 3;
+    const BATCH_CONTAINER_SIZE = 12;
+    const TRAIN_DATA_SIZE = 100;
+    const TEST_DATA_SIZE = 20;
 
     const [trainD, trainL] = tf.tidy(() => {
       const bat = data.getTrainBatchContainer(TRAIN_DATA_SIZE);
-      return [bat.xSet.reshape([TRAIN_DATA_SIZE, 200, 200, 3]), bat.labelsSet];
+      return [bat.xSet.reshape([TRAIN_DATA_SIZE, IMAGE_WIDTH, IMAGE_HEIGTH, 1]), bat.labelsSet];
     });
 
     const [testD, testL] = tf.tidy(() => {
       const bat = data.getTestBatchContainer(TEST_DATA_SIZE);
-      return [bat.xSet.reshape([TEST_DATA_SIZE, 200, 200, 3]), bat.labelsSet];
+      return [bat.xSet.reshape([TEST_DATA_SIZE, IMAGE_WIDTH, IMAGE_HEIGTH, 1]), bat.labelsSet];
     });
 
     return model.fit(trainD, trainL, {
       batchSize: BATCH_CONTAINER_SIZE,
+      validationData: [testD, testL],
       epochs: 5,
       shuffle: true
     });
@@ -99,7 +100,7 @@ class CNN {
 
   makePrediction(model, data, dataSize) {
     const testData = data.getTestBatchContainer(dataSize);
-    const testD = testData.xSet.reshape([dataSize, 200, 200, 3]);
+    const testD = testData.xSet.reshape([dataSize, IMAGE_WIDTH, IMAGE_HEIGTH, 1]);
     const labels = testData.labelsSet;
     const predictions = model.predict(testD);
     testD.dispose();
