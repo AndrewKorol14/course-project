@@ -10,7 +10,8 @@ const IMAGE_CHANNELS = 1;
 const IMAGE_WIDTH = 100;
 const IMAGE_HEIGTH = 100;
 const MAX_POOLING = 2;
-const DROPOUT_VALUE = 0.5;
+const DROPOUT_VALUE_1 = 0.25;
+const DROPOUT_VALUE_2 = 0.8;
 const DIMENSIONALITY = 128;
 //Number of gestures
 const NUMBER_OF_CLASSES = 4;
@@ -25,7 +26,8 @@ class CNN {
       inputShape: [IMAGE_WIDTH, IMAGE_HEIGTH, IMAGE_CHANNELS],
       filters: NUMBER_OF_FILTERS,
       kernelSize: KERNEL_SIZE,
-      padding: 'valid'
+      padding: 'valid',
+      kernelInitializer: 'varianceScaling'
     }));
 
     this.model.add(tf.layers.reLU());
@@ -42,7 +44,7 @@ class CNN {
     }));
 
     this.model.add(tf.layers.dropout({
-      rate: DROPOUT_VALUE
+      rate: DROPOUT_VALUE_1
     }));
 
     this.model.add(tf.layers.flatten());
@@ -54,7 +56,7 @@ class CNN {
     this.model.add(tf.layers.reLU());
 
     this.model.add(tf.layers.dropout({
-      rate: DROPOUT_VALUE
+      rate: DROPOUT_VALUE_2
     }));
 
     this.model.add(tf.layers.dense({
@@ -63,8 +65,9 @@ class CNN {
 
     this.model.add(tf.layers.softmax());
 
+    let opt = tf.train.sgd(0.1);
     this.model.compile({
-      optimizer: 'adadelta',
+      optimizer: opt,
       loss: 'categoricalCrossentropy',
       metrics: ['accuracy']
     });
@@ -76,31 +79,32 @@ class CNN {
   }
 
   async trainCNNModel(model, data) {
-    const BATCH_CONTAINER_SIZE = 12;
-    const TRAIN_DATA_SIZE = 100;
-    const TEST_DATA_SIZE = 20;
+    const BATCH_CONTAINER_SIZE = 32;
+    const TRAIN_DATA_SIZE = 190;
+    const TEST_DATA_SIZE = 50;
 
     const [trainD, trainL] = tf.tidy(() => {
       const bat = data.getTrainBatchContainer(TRAIN_DATA_SIZE);
-      return [bat.xSet.reshape([TRAIN_DATA_SIZE, IMAGE_WIDTH, IMAGE_HEIGTH, 1]), bat.labelsSet];
+      return [bat.xSet.reshape([TRAIN_DATA_SIZE, IMAGE_WIDTH, IMAGE_HEIGTH, IMAGE_CHANNELS]), bat.labelsSet];
     });
 
     const [testD, testL] = tf.tidy(() => {
       const bat = data.getTestBatchContainer(TEST_DATA_SIZE);
-      return [bat.xSet.reshape([TEST_DATA_SIZE, IMAGE_WIDTH, IMAGE_HEIGTH, 1]), bat.labelsSet];
+      return [bat.xSet.reshape([TEST_DATA_SIZE, IMAGE_WIDTH, IMAGE_HEIGTH, IMAGE_CHANNELS]), bat.labelsSet];
     });
 
     return model.fit(trainD, trainL, {
       batchSize: BATCH_CONTAINER_SIZE,
       validationData: [testD, testL],
-      epochs: 5,
+      epochs: 20,
       shuffle: true
+      //callbacks: tf.callbacks.earlyStopping({monitor: 'val_acc'})
     });
   }
 
   makePrediction(model, data, dataSize) {
     const testData = data.getTestBatchContainer(dataSize);
-    const testD = testData.xSet.reshape([dataSize, IMAGE_WIDTH, IMAGE_HEIGTH, 1]);
+    const testD = testData.xSet.reshape([dataSize, IMAGE_WIDTH, IMAGE_HEIGTH, IMAGE_CHANNELS]);
     const labels = testData.labelsSet;
     const predictions = model.predict(testD);
     testD.dispose();

@@ -10,8 +10,11 @@ async function run() {
   const model = cnn.createCNNModel();
   await cnn.trainCNNModel(model, data);
   
-  const [p, l] = cnn.makePrediction(model, data, 10);
-  p.print(); console.log('-------------------'); l.print();
+  const [p, l] = cnn.makePrediction(model, data, 10); 
+  console.log('Predicitions');
+  p.print(); 
+  console.log('Labels'); 
+  l.print();
 }  
 
 run();

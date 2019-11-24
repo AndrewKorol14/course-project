@@ -12,11 +12,26 @@ class ImageConverter {
   }
 
   decodeImgFromUInt8ArrayToTensor(array) {
-    return tf.node.decodeImage(array, 3);
+    return tf.node.decodeImage(array, 1);
   }
 
   async getImagesUInt8Array(dirPath, imageSize, imageNumber){
-    let files = fs.readdirSync('./imgFolder');
+    let files = fs.readdirSync('./cannyImgFolder');
+
+    tf.util.shuffle(files);
+    let labelsArr = [];
+    for(let i = 0; i < files.length; i++){
+      if(files[i].includes('k')){
+        labelsArr.push(1, 0, 0, 0);
+      } else if(files[i].includes('l')){
+        labelsArr.push(0, 1, 0, 0);
+      } else if(files[i].includes('o')){
+        labelsArr.push(0, 0, 1, 0);
+      } else if(files[i].includes('p')){
+        labelsArr.push(0, 0, 0, 1);
+      }
+    }
+
     let imageDataset = new Uint8Array(imageSize * imageNumber);
     for(let i = 0; i < files.length; i++) {
       let imageNameArray = new Uint8Array(fs.readFileSync(`${dirPath}${files[i]}`));
@@ -25,7 +40,7 @@ class ImageConverter {
       }      
     }
     
-    return imageDataset;
+    return [imageDataset, labelsArr];
   }
 }
 

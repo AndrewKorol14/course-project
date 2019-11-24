@@ -8,9 +8,9 @@ const COMMON_IMAGE_SIZE = 100 * 100 * 1;
 
 const CLASS_QUANTITY = 4;
 
-const ALL_ELEMENT_QUANTITY = 120;
-const TRAIN_ELEMENT_QUANTITY = 100;
-const TEST_ELEMENT_QUANTITY = 20;
+const ALL_ELEMENT_QUANTITY = 240;
+const TRAIN_ELEMENT_QUANTITY = 200;
+const TEST_ELEMENT_QUANTITY = 40;
 
 class Data {
   constructor(){
@@ -22,8 +22,8 @@ class Data {
   }
 
 async load() {
-    let labelsArr = new Uint8Array(labelsJson.labels),
-      imagesArr = await imgConv.getImagesUInt8Array('./cannyImgFolder/', COMMON_IMAGE_SIZE, ALL_ELEMENT_QUANTITY);
+    let [imagesArr, imageLabels] = await imgConv.getImagesUInt8Array('./cannyImgFolder/', COMMON_IMAGE_SIZE, ALL_ELEMENT_QUANTITY),
+    labelsArr = new Uint8Array(imageLabels);
     
     this.trainInd = tf.util.createShuffledIndices(TRAIN_ELEMENT_QUANTITY);
     this.testInd = tf.util.createShuffledIndices(TEST_ELEMENT_QUANTITY);
@@ -31,8 +31,8 @@ async load() {
     this.trainImages = imagesArr.slice(0, COMMON_IMAGE_SIZE * TRAIN_ELEMENT_QUANTITY);
     this.testImages = imagesArr.slice(COMMON_IMAGE_SIZE * TRAIN_ELEMENT_QUANTITY); //console.log(imagesArr.length);
 
-    this.trainLabels = labelsArr.slice(0, CLASS_QUANTITY * TRAIN_ELEMENT_QUANTITY);
-    this.testLabels = labelsArr.slice(CLASS_QUANTITY * TRAIN_ELEMENT_QUANTITY); //console.log(this.trainLabels);
+    this.trainLabels = labelsArr.slice(0, CLASS_QUANTITY * TRAIN_ELEMENT_QUANTITY); //console.log(this.trainLabels[this.trainLabels.length - 1]);
+    this.testLabels = labelsArr.slice(CLASS_QUANTITY * TRAIN_ELEMENT_QUANTITY); //console.log(this.testLabels[this.testLabels.length-1]);
   }
 
   getBatchContainer(size, data, indexCallback){
