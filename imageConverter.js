@@ -16,7 +16,7 @@ class ImageConverter {
   }
 
   async getImagesUInt8Array(dirPath, imageSize, imageNumber){
-    let files = fs.readdirSync('./cannyImgFolder');
+    let files = fs.readdirSync('./logImgFolder');
 
     tf.util.shuffle(files);
     let labelsArr = [];

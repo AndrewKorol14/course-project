@@ -1,6 +1,6 @@
 Work used Node.js only via console
 Open console and use next command:
-    node --experimenatal-modules app.js
+    node --experimental-modules app.js
 
 Program creates CNN, train model and make some prediction    
 

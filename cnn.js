@@ -11,7 +11,7 @@ const IMAGE_WIDTH = 100;
 const IMAGE_HEIGTH = 100;
 const MAX_POOLING = 2;
 const DROPOUT_VALUE_1 = 0.25;
-const DROPOUT_VALUE_2 = 0.8;
+const DROPOUT_VALUE_2 = 0.5;
 const DIMENSIONALITY = 128;
 //Number of gestures
 const NUMBER_OF_CLASSES = 4;
@@ -65,9 +65,9 @@ class CNN {
 
     this.model.add(tf.layers.softmax());
 
-    let opt = tf.train.sgd(0.1);
+    
     this.model.compile({
-      optimizer: opt,
+      optimizer: 'adam',
       loss: 'categoricalCrossentropy',
       metrics: ['accuracy']
     });
@@ -80,8 +80,8 @@ class CNN {
 
   async trainCNNModel(model, data) {
     const BATCH_CONTAINER_SIZE = 32;
-    const TRAIN_DATA_SIZE = 190;
-    const TEST_DATA_SIZE = 50;
+    const TRAIN_DATA_SIZE = 180;
+    const TEST_DATA_SIZE = 60;
 
     const [trainD, trainL] = tf.tidy(() => {
       const bat = data.getTrainBatchContainer(TRAIN_DATA_SIZE);
@@ -92,11 +92,12 @@ class CNN {
       const bat = data.getTestBatchContainer(TEST_DATA_SIZE);
       return [bat.xSet.reshape([TEST_DATA_SIZE, IMAGE_WIDTH, IMAGE_HEIGTH, IMAGE_CHANNELS]), bat.labelsSet];
     });
-
+    
     return model.fit(trainD, trainL, {
       batchSize: BATCH_CONTAINER_SIZE,
       validationData: [testD, testL],
-      epochs: 20,
+      //validationSplit: 0.25,
+      epochs: 10,
       shuffle: true
       //callbacks: tf.callbacks.earlyStopping({monitor: 'val_acc'})
     });

@@ -9,8 +9,8 @@ const COMMON_IMAGE_SIZE = 100 * 100 * 1;
 const CLASS_QUANTITY = 4;
 
 const ALL_ELEMENT_QUANTITY = 240;
-const TRAIN_ELEMENT_QUANTITY = 200;
-const TEST_ELEMENT_QUANTITY = 40;
+const TRAIN_ELEMENT_QUANTITY = 180;
+const TEST_ELEMENT_QUANTITY = 60;
 
 class Data {
   constructor(){
@@ -22,7 +22,7 @@ class Data {
   }
 
 async load() {
-    let [imagesArr, imageLabels] = await imgConv.getImagesUInt8Array('./cannyImgFolder/', COMMON_IMAGE_SIZE, ALL_ELEMENT_QUANTITY),
+    let [imagesArr, imageLabels] = await imgConv.getImagesUInt8Array('./logImgFolder/', COMMON_IMAGE_SIZE, ALL_ELEMENT_QUANTITY),
     labelsArr = new Uint8Array(imageLabels);
     
     this.trainInd = tf.util.createShuffledIndices(TRAIN_ELEMENT_QUANTITY);
@@ -50,6 +50,9 @@ async load() {
     }
 
     let xSet = tf.tensor2d(batchContainerImgArr, [size, COMMON_IMAGE_SIZE]);
+    let maxXSet = tf.max(xSet);
+    xSet = xSet.div(maxXSet);
+
     let labelsSet = tf.tensor2d(batchContainerLabArr, [size, CLASS_QUANTITY]);
 
     return {xSet, labelsSet}; 
