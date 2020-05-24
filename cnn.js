@@ -80,8 +80,8 @@ class CNN {
 
   async trainCNNModel(model, data) {
     const BATCH_CONTAINER_SIZE = 32;
-    const TRAIN_DATA_SIZE = 180;
-    const TEST_DATA_SIZE = 60;
+    const TRAIN_DATA_SIZE = 540;
+    const TEST_DATA_SIZE = 180;
 
     const [trainD, trainL] = tf.tidy(() => {
       const bat = data.getTrainBatchContainer(TRAIN_DATA_SIZE);
@@ -97,9 +97,9 @@ class CNN {
       batchSize: BATCH_CONTAINER_SIZE,
       validationData: [testD, testL],
       //validationSplit: 0.25,
-      epochs: 10,
-      shuffle: true
-      //callbacks: tf.callbacks.earlyStopping({monitor: 'val_acc'})
+      epochs: 30,
+      shuffle: true,
+      callbacks: tf.node.tensorBoard('logs')
     });
   }
 

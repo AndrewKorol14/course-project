@@ -11,6 +11,8 @@ async function run() {
   await cnn.trainCNNModel(model, data);
   
   const [p, l] = cnn.makePrediction(model, data, 10); 
+  const out = tf.math.confusionMatrix(l.argMax([-1]), p.argMax([-1]), 4);
+  out.print();
   console.log('Predicitions');
   p.print(); 
   console.log('Labels'); 
